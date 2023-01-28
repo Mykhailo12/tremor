@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="{% static 'style/style.css' %}" />
+    <title>Tremor</title>
+  </head>
+
+  <body>
+
+    {% include 'navbar.html' %}
+
+    {% block content %}
+
+    {% endblock %}
+  </body>
+</html>

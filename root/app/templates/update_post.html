@@ -1,0 +1,9 @@
+{% extends 'main.html' %}
+{% block content %}
+<form method="POST" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="text" value="{{post.text}}">
+    <input type="file" name="img">
+    <button type="submit">Update</button>
+</form>
+{% endblock %}

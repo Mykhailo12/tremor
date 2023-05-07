@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+{% block content %}  
+    <h3>Friends:</h3>
+    {% if friends %}
+        {% for friend in friends %}
+            <a href="{% url 'profile' friend.id %}">{{friend.username}}</a>
+            <a href="{% url 'change_friends' operation='remove' pk=friend.pk %}">
+                <input type="button" value="Remove friend">
+            </a>
+        {% endfor %}
+    {% else %}
+        <h4>{{text}}</h4>
+        <a href="{% url 'peoples' %}">Search new friends</a>
+    {% endif %}
+{% endblock %}

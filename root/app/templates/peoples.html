@@ -1,0 +1,18 @@
+{% extends 'main.html' %}
+{% block content %}
+    Peoples
+
+    {% for friend in friends %}
+        {{friend.username}}
+    {% endfor %}
+    
+    <form action="{% url 'peoples' %}">
+        <input type="search" placeholder="search" name="search">
+        <button type="submit">Search</button>
+    </form>
+
+    {% for user in users %}
+        <a href="{% url 'profile' user.id %}"><p>{{user}}</p></a>
+    {% endfor %}
+    
+{% endblock %}

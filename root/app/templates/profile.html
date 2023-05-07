@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+{% block content %}
+    {% if user == request.user %}
+        <h3>{{user.username}}</h3>
+    {% else %}
+        <h3>{{user.username}}</h3>
+        {% if is_friend == False %}
+            <a href="{% url 'change_friends' operation='add' pk=user.pk %}">
+                <input type="button" value="Add friend">
+            </a>
+        {% endif %}
+        <a href="{% url 'room' room_name=chat_name %}">Chat</a>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,12 @@
+img {
+    max-width: 200px;
+    max-height: 200px;
+}
+.post {
+    border: 1px solid black;
+    margin: 50px 500px;
+}
+textarea {
+    width: 400px;
+    height: 200px;
+}

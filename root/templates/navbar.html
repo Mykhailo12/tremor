@@ -1,4 +1,7 @@
 TREMOR
 {% if request.user.is_authenticated %}
     <a href="{% url 'logout' %}">logout</a>
+    <a href="{% url 'friends' %}">friends</a>
+    <a href="{% url 'peoples' %}">peoples</a>
+    <hr>
 {% endif %}

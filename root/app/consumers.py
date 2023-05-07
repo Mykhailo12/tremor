@@ -28,7 +28,14 @@ class ChatConsumer(WebsocketConsumer):
         sender = text_data_json["sender"]
         receiver = text_data_json["receiver"]
 
-        # Send message to room group
+        self.room_group_name = "chat_%s" % sender
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {"type": "chat_message", "message": message, "sender" : sender, "receiver" : receiver}
+        )
+
+        self.room_group_name = "chat_%s" % self.room_name
+
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, {"type": "chat_message", "message": message, "sender" : sender, "receiver" : receiver}
         )
@@ -39,11 +46,14 @@ class ChatConsumer(WebsocketConsumer):
         sender = event["sender"]
         receiver = event["receiver"]
 
-        Message.objects.create(
-            text=message,
-            sender=User.objects.get(username=sender),
-            receiver=User.objects.get(username=receiver),
-        )
+        print(message, sender, receiver)
+
+        if message != ' ' and sender != receiver:
+            Message.objects.create(
+                text=message,
+                sender=User.objects.get(username=sender),
+                receiver=User.objects.get(username=receiver),
+            )
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({"message": message}))

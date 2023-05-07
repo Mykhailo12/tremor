@@ -8,16 +8,19 @@
 </head>
 <body>
     <p id="current_user">{{request.user}}</p>
-
-    <p id="sender">Sender: {{sender}}</p>
-    <p id="receiver">Receiver: {{receiver}}</p>
-
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    
+    <p id="sender">{{sender}}</p>
+    <p id="receiver">{{receiver}}</p>
+    
+    <textarea id="chat-log" cols="100" rows="20">{% for message in messages %}{% if request.user.id == message.sender.id %}{{receiver}}: {{message.text}}
+{% elif request.user.id == message.sender.id %}{{sender}}: {{message.text}}
+{% endif %}{% endfor %}</textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const curr_user = document.getElementById('current_user').textContent;
         const sender = document.getElementById('sender').textContent;
         const receiver = document.getElementById('receiver').textContent;
 
@@ -31,7 +34,11 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (sender + ': ' + data.message + '\n');
+            if(curr_user == sender){
+                document.querySelector('#chat-log').value += (curr_user + ': ' + data.message + '\n');
+            } else if(curr_user != sender) {
+                document.querySelector('#chat-log').value += (receiver + ': ' + data.message + '\n');
+            }
         };
 
         chatSocket.onclose = function(e) {

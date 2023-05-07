@@ -4,7 +4,7 @@ from .forms import CreateUserForm, PostForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Friend, Post
+from .models import Friend, Post, Message
 from django.http import HttpResponse
 
 @login_required(login_url='login')
@@ -15,7 +15,9 @@ def room(request, room_name):
     sender=request.user 
     receiver=User.objects.get(username=room_name)
 
-    return render(request, "chatbox.html", {"room_name": room_name, 'sender':sender, 'receiver':receiver })
+    messages = Message.objects.filter(receiver=receiver, sender=sender)|Message.objects.filter(receiver=sender, sender=receiver)
+
+    return render(request, "chatbox.html", {"room_name": room_name, 'sender':sender, 'receiver':receiver, 'messages':messages})
 
 @login_required(login_url='login')
 def createPost(request):

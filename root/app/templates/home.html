@@ -1,21 +1,23 @@
 {% extends 'main.html' %}
+{% load static %}
 {% block content %}
-<br>
-home
-<br>
-<h3>user: {{request.user.username}}</h3>
-
-{% for post in posts %}
-    <div class="post">
-        <h3>{{post.host}}</h3>
-        <p>{{post.text}}</p>
-        <img src="static{{post.img.url}}">
-        <br>
-        {% if post.host == request.user %}
-            <a href="{% url 'update' post.id %}">Update</a>
-        {% endif %}
-    </div>
-    
-{% endfor %}
+<div class="post-create-div">
+    <a href="{% url 'create' %}" class="post-create-text"><img src="{% static 'images/plus-square-svgrepo-com.svg' %}" class="plus-svg"/></i> Add post</a></h2>
+</div>
+{% if is_post == True %}
+    {% for post in posts %}
+        <div class="post">
+            <img src="{% static 'images/uploads/avatar.jpg' %}" class="user-host-img"><h3 class="post-host">{{post.host}}</h3><h3 class="post-created">{{ post.created|date:"D, H:i" }}</h3>
+            <h3 class="post-text">{{post.text}}</h3>
+            <img src="static{{post.img.url}}" class="post-img">
+            <br>
+            {% if post.host == request.user %}
+                <a href="{% url 'update' post.id %}" class="update-text">Update</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <h3 class="no-posts-text">You have no publications now</h3>
+{% endif %}
 
 {% endblock %}

@@ -1,12 +1,345 @@
-img {
-    max-width: 200px;
-    max-height: 200px;
+:root {
+    --breakpoint-xs: 0;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; 
+    --post-block-width: 
 }
+
+a {
+    text-decoration: none;
+}
+
+html {
+    font-family: sans-serif;
+    line-height: 1.15;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background-color: #202124 !important;
+    color: white !important;
+}
+
 .post {
-    border: 1px solid black;
-    margin: 50px 500px;
+    background-color: #303134;
+    margin: auto;
+    margin-top: 20px;
+    border-radius: 5px;
+    width: 35vw;
 }
+
 textarea {
     width: 400px;
     height: 200px;
+}
+
+.my {
+    background-color: dimgray;
+    width: 40%;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin:5px;
+}
+
+.my p {
+    text-align: left;
+}
+
+.his {
+    background-color: #282828;
+    width: 40%;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid black;
+    margin:5px;
+}
+
+.his p {
+    text-align: right;
+}
+
+.chat-log{
+    color: white;
+    margin: 5px;
+    font-size: 20px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+  
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.logo-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.auth-text {
+    font-size: 40px;
+    text-align: center;
+    margin: 40px;
+}
+
+.register-text {
+    background-image: linear-gradient(
+      to right,
+      #9176FF,
+      #9176FF 50%,
+      white 50%
+    );
+    background-size: 200% 100%;
+    background-position: -100%;
+    display: inline-block;
+    padding: 5px 0;
+    position: relative;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease-in-out;
+    font-weight: bold;
+  }
+  
+  .register-text:before{
+    content: '';
+    background: #9176FF;
+    display: block;
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .register-text:hover {
+   background-position: 0;
+  }
+  
+  .register-text:hover::before{
+    width: 100%;
+  }
+
+.post-created {
+    font-size: 10px;
+    white-space: nowrap;
+    position: absolute;
+    margin-top: -38px;
+    margin-left: 120px;
+    color: #636363;
+}
+
+.user-name a {
+    text-decoration: none;
+    list-style-type: none; 
+    margin: 2px !important;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.user-avatar img {
+    list-style-type: none; 
+    text-decoration: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+.post-text {
+    margin: 10px;
+}
+
+.post-host {
+    position: absolute;
+    margin-top: -55px;
+    margin-left: 70px;
+}
+
+.update-text {
+    font-size: 20px;
+    text-decoration: none;
+    margin: 10px;
+    color: white;
+    margin-top: -5px;
+}
+
+.post-img {
+    position: relative;
+    margin: 1.7%;
+    object-fit: cover;
+    width: 33.8vw;
+    height: 100%;
+}
+
+
+.user-host-img{
+    list-style-type: none; 
+    text-decoration: none;
+    border-radius: 50%;
+    margin: 10px;
+    width: 50px;
+    height: 50px;
+}
+
+.navbar-nav {
+    width: 100%;
+    height: 50px;
+}
+
+.navbar-nav a {
+    margin: 5px;
+}
+
+.nav-user-info {
+    width: 30%;
+    float: right;
+}
+
+.navbar {
+    background-color: #303134 !important;
+}
+
+.login-form {
+    background-color: #303134 !important;
+    width: 500px;
+    height: 800px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    padding: 40px;
+}
+
+.container-auth {
+    margin: 0;
+    top: 10%;
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    transform: translateX(-50%);
+    background-color: #141623;
+    border-radius: 9px;
+    width: 500px;
+    height: 400px;
+    box-shadow: 1px 1px 108.8px 19.2px rgb(25,31,53);
+  }
+
+.container-register {
+  margin: 0;
+  top: 10%;
+  left: 50%;
+  position: absolute;
+  text-align: center;
+  transform: translateX(-50%);
+  background-color: #141623;
+  border-radius: 9px;
+  width: 500px;
+  height: 600px;
+  box-shadow: 1px 1px 108.8px 19.2px rgb(25,31,53);
+}
+
+.plus-svg {
+    width: 25px;
+    height: 25px;
+    margin-top: 0px;
+    margin-bottom: 4px;
+}
+
+.no-posts-text {
+    text-align: center;
+    font-size: 20px;
+    color: #636363;
+}
+.post-create-div {
+    position: relative;
+    text-align: center;
+    margin: 50px;
+}
+
+.post-create-text {
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    font-size: 30px;
+    position: relative;
+    text-decoration: none;
+}
+  
+.post-create-text::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: white;
+  bottom: 0;
+  left: 0;
+  transform-origin: right;
+  transform: scaleX(0);
+  transition: transform .3s ease-in-out;
+}
+  
+.post-create-text:hover::before {
+  transform-origin: left;
+  transform: scaleX(1);
+}
+
+.nimbus-button {
+    position: relative;
+    border: 0;
+    background: #6840ec;
+    color: #dfdeee;
+    border-radius: 100px;
+    width: 70%;
+    height: 49px;
+    font-size: 16px;
+    transition: 0.3s;
+    cursor: pointer;
+    margin: 20px;
+    text-align: center;
+    background-position: center;
+    transition: background 0.8s;
+}
+
+.create-post-btn {
+    margin: auto;
+    width: 20%;
+    text-align: center;
+}
+
+.nimbus-button:hover { background: #5b37d4 radial-gradient(circle, transparent 1%, #5a31df 1%) center/15000%; }
+.nimbus-button:active {
+    background-color: #6a4ccf;
+    background-size: 100%;
+}
+
+.nimbus-input {
+    position: relative;
+    display: block;
+    margin: 30px auto 10px auto;
+    background-color: #262e49 !important;
+    border: 0;
+    border-radius: 5px;
+    padding: 14px 10px;
+    width: 400px;
+    height: 40px;
+    outline: none;
+    color: #d6d6d6;
+    font-size: 15.5px !important;
 }

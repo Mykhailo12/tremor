@@ -1,18 +1,17 @@
-<h3>Register</h3>
-
-<form method="POST">
-    {% csrf_token %}
-    {{form.username.label}}
-    {{form.username}}
-
-    {{form.email.label}}
-    {{form.email}}
-
-    {{form.password1.label}}
-    {{form.password1}}
-
-    {{form.password2.label}}
-    {{form.password2}}
-    <input type="submit" value="Register">
-</form>
-<a href="{% url 'login' %}">login</a>
+{% extends 'main.html' %}
+{% block content %}
+    <form method="POST">
+        <div class="container-register">
+            <h3 class="auth-text">Login</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="text" name="username" autofocus class="nimbus-input" id="id_username">
+                <input type="email" name="email" class="nimbus-input" id="id_email">
+                <input type="password" name="password1" class="nimbus-input" value="Password" id="id_password1">
+                <input type="password" name="password2" class="nimbus-input" value="Repeat password" id="id_password2">
+                <input type="submit" value="Register" class="nimbus-button">
+            </form>
+            <a class="register-text" href="{% url 'login' %}">Already have an account?</a>
+        </div>
+    </form>
+{% endblock %}

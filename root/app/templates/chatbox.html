@@ -1,28 +1,129 @@
 {% extends 'main.html' %}
 {% block content %}  
-<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8"/>
-    <title>Chat Room</title>
-</head>
-<body>
-    <p id="current_user">{{request.user}}</p>
-    
-    <p id="sender">{{sender}}</p>
-    <p id="receiver">{{receiver}}</p>
-    
-    <textarea id="chat-log" cols="100" rows="20">{% for message in messages %}{% if request.user.id == message.sender.id %}{{receiver}}: {{message.text}}
-{% elif request.user.id == message.sender.id %}{{sender}}: {{message.text}}
-{% endif %}{% endfor %}</textarea><br>
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
+    <div class="chat-room">
+        <p id="current_user">{{request.user}}</p>
+        
+        <p id="sender">{{sender}}</p>
+        <p id="receiver">{{receiver}}</p>
+        {% for message in messages %}
+            {% if message.sender.id != request.user.id %}
+                <div id="{{message.id}}h" class="his">
+                    <p id="{{message.id}}" class="chat-log">{{message.sender}}: {{message.text}}</p>
+                </div>
+            {% else %}
+                <div id="{{message.id}}m" class="my" atr="{{message.id}}" oncontextmenu="pkm(this.getAttribute('atr'), event)">
+                    <p id="{{message.id}}p" class="chat-log">{{message.sender}}: {{message.text}}</p>
+                </div>
+                <div id="{{message.id}}" class="dropdown-content">
+                    <a atr="{{message.id}}" onclick="show_edit_btn(this.getAttribute('atr'))">Edit</a>
+                    <a atr="{{message.id}}" onclick="delete_message(this.getAttribute('atr'))">Delete</a>
+                    <a atr="{{message.text}}" id="{{message.id}}" onclick="copy_message(this.getAttribute('atr', 'id'))">Copy</a>
+                    <a>Reply</a>
+                    <a>Pin</a>
+                </div>
+            {% endif %}
+        {% endfor %}
+        <div id="board"></div>
+        <input id="chat-message-input" type="text" size="100"><br>
+        <input id="chat-message-submit" type="button" value="Send">
+        <input id="chat-message-edit" type="button" onclick="edit_click()" value="Edit" style="display:none;">
+    </div>
     {{ room_name|json_script:"room-name" }}
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
         const curr_user = document.getElementById('current_user').textContent;
         const sender = document.getElementById('sender').textContent;
         const receiver = document.getElementById('receiver').textContent;
+
+        let count = 0;
+
+        let msg_id;
+
+        function pkm(id, e){
+            let cursor_x = e.clientX;
+            if(count == 0) {
+                event.preventDefault();
+                document.getElementById(id).style.display = "block";
+                document.getElementById(id).style.marginLeft = cursor_x + "px";
+                count += 1;
+            }
+            console.log(e.clientX);
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.my')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.style.display == "block") {
+                        openDropdown.style.display = "none";
+                        count -= 1;
+                    }
+                }
+            }
+        }  
+
+        function delete_message(id) {
+            message = document.getElementById(id+"m").remove();
+            console.log(id)
+
+            chatSocket.send(JSON.stringify({
+                'edited_message': null,
+                'id' : null,
+                'deleted_message_id' : id,
+                'message': null,
+                'sender' : sender,
+                'receiver' : null,
+            }));
+        }
+        
+        function copy_message(text, id) {
+            let copyTextarea = document.createElement("textarea");
+            console.log(id)
+            copyTextarea.style.position = "fixed";
+            copyTextarea.style.opacity = "0";
+            copyTextarea.textContent = text;
+            
+            document.body.appendChild(copyTextarea);
+            console.log('text', copyTextarea);
+            copyTextarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(copyTextarea);
+        }
+
+        function show_edit_btn(id) {
+            document.getElementById('chat-message-submit').style.display = 'none';
+            document.getElementById('chat-message-edit').style.display = 'block';
+
+            msg_id = id;
+        }
+
+        console.log('local id', msg_id)
+
+        function edit_click() {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+
+            console.log(message)
+            console.log(msg_id)
+
+            if(message.trim() != '') {
+                console.log('trim')
+                chatSocket.send(JSON.stringify({
+                    'edited_message': message,
+                    'id' : msg_id,
+                    'message': null,
+                    'sender' : sender,
+                    'receiver' : receiver,
+                    'deleted_message_id' : null,
+                }));
+                messageInputDom.value = '';
+                document.getElementById('chat-message-submit').style.display = 'block';
+                document.getElementById('chat-message-edit').style.display = 'none';
+            }
+        }
 
         const chatSocket = new WebSocket(
             'ws://'
@@ -34,10 +135,49 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            if(curr_user == sender){
-                document.querySelector('#chat-log').value += (curr_user + ': ' + data.message + '\n');
-            } else if(curr_user != sender) {
-                document.querySelector('#chat-log').value += (receiver + ': ' + data.message + '\n');
+            const board = document.getElementById('board');
+            
+            console.log('data', data)
+
+            if(data.edited_message != null) {
+                msg_id = data.id
+                console.log('ed', data.edited_message, msg_id)
+                msg_p = document.getElementById(msg_id + 'm')
+                //console.log('msg_p', msg_p.textContent)
+                console.log('msg_p', msg_p)
+                msg_p.textContent = data.sender + ': ' + data.edited_message;
+                msg_id = 0;  
+            } else if (data.message != null) {
+                console.log('message else')
+                let atr = "'atr'"
+                let id = "'id'"
+                const text_box_my = '<div id="'+ data.id +'m" class="my" atr="'+ data.id +'" oncontextmenu="pkm(this.getAttribute('+ atr + '), event)">' +
+                '<p id="{{message.id}}p" class="chat-log">' + data.sender + ': ' + data.message + '</p>' +
+                '</div>' +
+                '<div id="'+ data.id +'" class="dropdown-content">' +
+                    '<a atr="'+ data.id +'" onclick="show_edit_btn(this.getAttribute(' + atr + '))">Edit</a>' +
+                    '<a atr="'+ data.id +'" onclick="delete_message(this.getAttribute(' + atr +'))">Delete</a>' +
+                    '<a atr="'+ data.message +'" id="'+ data.id +'" onclick="copy_message(this.getAttribute(' + atr + ',' + id + '))">Copy</a>' +
+                    '<a>Reply</a>' +
+                    '<a>Pin</a>' +
+                '</div>'
+
+                const text_box_his = '<div id="' + data.id + 'h" class="his">' +
+                '<p id="{{message.id}}p" class="chat-log">' + data.sender + ': ' + data.message + '</p>' +
+                '</div>'
+
+                if(curr_user != data.sender) {
+                    board.innerHTML += text_box_his;
+                } else {
+                    board.innerHTML += text_box_my;
+                }
+
+            } else if (data.deleted_message_id != null) {
+                console.log(data.deleted_message_id, "id")
+                msg_id = data.deleted_message_id
+
+                let msgg = document.getElementById(msg_id + "h");
+                msgg.remove()
             }
         };
 
@@ -55,14 +195,18 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'sender' : sender,
-                'receiver' : receiver
-            }));
-            messageInputDom.value = '';
+            console.log(message)
+            if(message.trim() != '') {
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'sender' : sender,
+                    'receiver' : receiver,
+                    'deleted_message_id' : null,
+                    'edited_message': null,
+                }));
+                messageInputDom.value = '';
+            }
         };
     </script>
-</body>
 </html>
 {% endblock %}

@@ -36,7 +36,7 @@ class Message(models.Model):
     seen = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"To: {self.receiver} From: {self.sender}"
+        return f"{self.text}"
     
     class Meta:
         ordering = ['-updated', '-created']

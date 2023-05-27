@@ -15,7 +15,9 @@ def room(request, room_name):
     sender=request.user 
     receiver=User.objects.get(username=room_name)
 
-    messages = Message.objects.filter(receiver=receiver, sender=sender)|Message.objects.filter(receiver=sender, sender=receiver)
+    messages = reversed(Message.objects.filter(receiver=receiver, sender=sender)|Message.objects.filter(receiver=sender, sender=receiver))
+
+    print(type(messages))
 
     return render(request, "chatbox.html", {"room_name": room_name, 'sender':sender, 'receiver':receiver, 'messages':messages})
 
@@ -94,7 +96,11 @@ def logoutUser(request):
 @login_required(login_url='/login/')
 def home(request):
     posts = Post.objects.all()
-    context={'posts' : posts}
+    is_post = False
+    if len(posts) > 0:
+        is_post = True
+
+    context={'posts' : posts, 'is_post' : is_post}
     return render(request, 'home.html', context)
 
 def friendsPage(request):

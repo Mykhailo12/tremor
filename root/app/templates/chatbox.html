@@ -1,4 +1,6 @@
 {% extends 'main.html' %}
+{% load static %}
+{% load app_profile %}
 {% block content %}  
 <html>
     <div class="chat-room">
@@ -9,12 +11,23 @@
         {% for message in messages %}
             {% if message.sender.id != request.user.id %}
                 <div id="{{message.id}}h" class="his">
-                    <p id="{{message.id}}" class="chat-log">{{message.sender}}: {{message.text}}</p>
+                    {% get_static_prefix as STATIC_PREFIX %}
+                    <img class="chat-host-avatar" src="{{STATIC_PREFIX}}images/{% profile receiver %}">
+                    <div class="his-message-body">
+                        <p class="chat-log-sender">{{message.sender}}</p>
+                        <p id="{{message.id}}" class="chat-log-his">{{message.text}}</p>
+                    </div>
                 </div>
             {% else %}
                 <div id="{{message.id}}m" class="my" atr="{{message.id}}" oncontextmenu="pkm(this.getAttribute('atr'), event)">
-                    <p id="{{message.id}}p" class="chat-log">{{message.sender}}: {{message.text}}</p>
+                    <div class="my-message-body">
+                        <p id="{{message.id}}p" class="chat-log-my">{{message.text}}</p>
+                        <div class="my-message-created">
+                            <span >{{message.created|date:"H:i"}}</span>
+                        </div>
+                    </div>  
                 </div>
+
                 <div id="{{message.id}}" class="dropdown-content">
                     <a atr="{{message.id}}" onclick="show_edit_btn(this.getAttribute('atr'))">Edit</a>
                     <a atr="{{message.id}}" onclick="delete_message(this.getAttribute('atr'))">Delete</a>
@@ -24,10 +37,13 @@
                 </div>
             {% endif %}
         {% endfor %}
-        <div id="board"></div>
-        <input id="chat-message-input" type="text" size="100"><br>
-        <input id="chat-message-submit" type="button" value="Send">
-        <input id="chat-message-edit" type="button" onclick="edit_click()" value="Edit" style="display:none;">
+        <div id="board" class="board"></div>
+        <i id="scroll-bottom"></i>
+    </div>
+    <div class="chat-navigation">
+        <textarea class="chat-input" id="chat-message-input" type="text"></textarea>    
+        <input class="chat-submit" id="chat-message-submit" type="button" value="Send">
+        <input class="chat-edit" id="chat-message-edit" type="button" onclick="edit_click()" value="Edit" style="display:none;">
     </div>
     {{ room_name|json_script:"room-name" }}
     <script>
@@ -39,6 +55,14 @@
         let count = 0;
 
         let msg_id;
+
+        location.href = '#scroll-bottom';
+
+        $('#chat-message-input').on('input', function(){
+	        this.style.height = '50px';
+
+	        this.style.height = (this.scrollHeight + 6) + 'px'; 
+        });
 
         function pkm(id, e){
             let cursor_x = e.clientX;
@@ -152,7 +176,12 @@
                 let atr = "'atr'"
                 let id = "'id'"
                 const text_box_my = '<div id="'+ data.id +'m" class="my" atr="'+ data.id +'" oncontextmenu="pkm(this.getAttribute('+ atr + '), event)">' +
-                '<p id="{{message.id}}p" class="chat-log">' + data.sender + ': ' + data.message + '</p>' +
+                    '<div class="my-message-body">' +
+                        '<p id="' + data.id + 'p" class="chat-log-my">' + data.message + '</p>' +
+                        '<div class="my-message-created">' +
+                            '<span>' + data.created + '</span>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>' +
                 '<div id="'+ data.id +'" class="dropdown-content">' +
                     '<a atr="'+ data.id +'" onclick="show_edit_btn(this.getAttribute(' + atr + '))">Edit</a>' +
@@ -163,13 +192,19 @@
                 '</div>'
 
                 const text_box_his = '<div id="' + data.id + 'h" class="his">' +
-                '<p id="{{message.id}}p" class="chat-log">' + data.sender + ': ' + data.message + '</p>' +
+                '<img class="chat-host-avatar" src="{% static "images/uploads/avatar.jpg" %}">' +
+                    '<div class="his-message-body">' +
+                        '<p class="chat-log-sender">' + data.sender + '</p>' +
+                        '<p id="' + data.id + '" class="chat-log-his">' + data.message + '</p>' +
+                    '</div>' +  
                 '</div>'
 
                 if(curr_user != data.sender) {
                     board.innerHTML += text_box_his;
+                    location.href = '#scroll-bottom';
                 } else {
                     board.innerHTML += text_box_my;
+                    location.href = '#scroll-bottom';
                 }
 
             } else if (data.deleted_message_id != null) {
@@ -187,7 +222,10 @@
 
         document.querySelector('#chat-message-input').focus();
         document.querySelector('#chat-message-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {
+            if (e.keyCode == 13 && e.shiftKey) {
+                form.submit();
+            } 
+            else if (e.keyCode === 13) {
                 document.querySelector('#chat-message-submit').click();
             }
         };
@@ -195,6 +233,11 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
+
+            document.querySelector('#chat-message-input').style.height = '54px';
+            
+            location.href = '#scroll-bottom';
+
             console.log(message)
             if(message.trim() != '') {
                 chatSocket.send(JSON.stringify({

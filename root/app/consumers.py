@@ -84,12 +84,17 @@ class ChatConsumer(WebsocketConsumer):
 
             self.room_group_name = "chat_%s" % sender
 
+            created = Message.objects.get(id=id).created.strftime('%H:%M')
+
+            print(created)
+
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name, {
                     "type": "chat_message", 
                     "message": message, 
                     "sender" : sender, 
                     "receiver" : receiver, 
+                    "created" : created,
                     "id" : id
                 }
             )
@@ -102,6 +107,7 @@ class ChatConsumer(WebsocketConsumer):
                     "message": message, 
                     "sender" : sender, 
                     "receiver" : receiver, 
+                    "created" : created,
                     "id" : id
                 }
             )
@@ -130,14 +136,15 @@ class ChatConsumer(WebsocketConsumer):
 
     # Receive message from room group
     def chat_message(self, event):
-        print(event)
+        print("event:", event)
         if event["message"] != None:
             message = event["message"]
             sender = event["sender"]
             receiver = event["receiver"]
+            created = event["created"]
             id = event["id"]
             
-            self.send(text_data=json.dumps({"message": message, "sender" : sender, "receiver" : receiver, "id" : id}))
+            self.send(text_data=json.dumps({"message": message, "sender" : sender, "receiver" : receiver, "id" : id, "created" : created}))
 
         elif event["edited_message"] != None:
             edited_message = event["edited_message"]

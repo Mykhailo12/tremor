@@ -3,6 +3,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="avatars/", default='avatars/avatar.jpg', verbose_name="user avatar")
+    bio = models.TextField(max_length=500, null=True)
+
 class Post(models.Model):
     host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     text = models.TextField(max_length=2000)

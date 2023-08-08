@@ -39,35 +39,147 @@ textarea {
 }
 
 .my {
-    background-color: dimgray;
-    width: 40%;
-    height: 30px;
-    border-radius: 5px;
-    border: 1px solid black;
-    margin:5px;
+    min-height: 77.325px;
 }
 
 .my p {
     text-align: left;
+    word-wrap: break-word;
+    width: 97%;
+    max-width: 445.275px;
+    min-width: 100px;
+    padding: 5px;
+    padding-left: 15px;
 }
 
-.his {
-    background-color: #282828;
-    width: 40%;
-    height: 30px;
+.my-message-body {
+    background-color: dimgray;
     border-radius: 5px;
     border: 1px solid black;
-    margin:5px;
+    float: right;
+    max-width: 70%;
+    min-height: 30px;
+    min-width: 40px;
+    padding: 5px;
+    padding-bottom: 20px;
+    position: relative;
+    margin: 1px 10px 1px 0px;
+}
+
+.my-message-created{
+    font-size: 15px;
+    padding: 0px;
+    margin: 0px;
+    overflow: auto;
+    position: absolute;
+    right: 10px;
+    bottom: 0px;
+}   
+
+.his {
+    float: bottom;
+    min-height: 77.325px;   
+    max-width: 70%;
 }
 
 .his p {
-    text-align: right;
+    text-align: left;
+    word-wrap: break-word;
+    max-width: 400px;
+    min-width: 100px;
+    padding-bottom: 0px;
+    padding-top: 5px;
+    padding-right: 15px;
+    margin-top: 0px;
+
 }
 
-.chat-log{
+.his-message-body {
+    background-color: #282828;
+    border-radius: 5px;
+    border: 1px solid black;
+    float: left;
+    position: relative;
+    max-width: 70%;
+    min-width: 60px;
+    min-height: 30px;
+    margin: 1px 0px 1px 0px;
+}
+
+.chat-room {
+    background-color: #303134;
+    width: 60%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: auto;
+    margin: 30px auto 0px auto;
+    border-radius: 10px;
+    overflow: auto;
+    padding-bottom: 10px;
+    max-height: 85vh;
+}
+
+.chat-room::-webkit-scrollbar {
+    width: 10px;
+    background-color: #303134;
+}
+
+.chat-room::-webkit-scrollbar-thumb  {
+    background-color: dimgray;
+}
+
+.chat-navigation {
+    width: 60%;
+    margin: auto;
+}
+
+.chat-navigation textarea {
+	width: 90%;
+	background-color: #fff;
+	height: 54px;
+	font-size: 20px; 
+	line-height: 1.2;
+    resize: none;
+    margin: auto;
+    max-height: 150px;
+}
+
+.board {
+    height: 100%;
+    display: grid;
+}
+
+.chat-submit {
+    width: 10%;
+    float: right;
+    height: 54px;
+}
+
+.chat-edit {
+    float: right;
+    width: 10%;
+    height: 54px;
+}
+
+.chat-log-my{
     color: white;
-    margin: 5px;
+    margin: 5px 5px 5px 10px;
     font-size: 20px;
+    float: right;
+}
+
+.chat-log-his{
+    color: white;
+    margin: 5px 5px 5px 10px;
+    font-size: 20px;
+    float: left;
+}
+
+.chat-log-sender {
+    color: white;
+    font-size: 20px;
+    float: top;
+    margin: 0px 0px 0px 10px;
 }
 
 .dropdown-content {
@@ -195,6 +307,16 @@ textarea {
     margin: 10px;
     width: 50px;
     height: 50px;
+}
+
+.chat-host-avatar {
+    list-style-type: none; 
+    text-decoration: none;
+    border-radius: 50%;
+    margin: 10px;
+    width: 30px;
+    height: 30px;
+    float: left;
 }
 
 .navbar-nav {

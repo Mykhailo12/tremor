@@ -2,6 +2,8 @@
 {% block content %}
     {% if user == request.user %}
         <h3>{{user.username}}</h3>
+        <p>{{profile.bio}}</p>
+        <a href="{% url 'update_profile' user.id %}">update profile</a>
     {% else %}
         <h3>{{user.username}}</h3>
         {% if is_friend == False %}

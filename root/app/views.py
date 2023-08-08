@@ -1,10 +1,10 @@
 import os
 from django.shortcuts import render, redirect
-from .forms import CreateUserForm, PostForm
+from .forms import CreateUserForm, PostForm, ProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Friend, Post, Message
+from .models import Friend, Post, Message, Profile
 from django.http import HttpResponse
 
 @login_required(login_url='login')
@@ -61,16 +61,48 @@ def updatePost(request, pk):
     context = {'post':post}
     return render(request, 'update_post.html', context)
 
-def registerPage(request):
-    form = CreateUserForm()
+@login_required(login_url='login')
+def updateProfile(request, pk):
+    profile = Profile.objects.get(user_id=pk)
+
+    if request.user != profile.user:
+        return HttpResponse("Your are not allowed here!!")
 
     if request.method == 'POST':
-        form = CreateUserForm(request.POST)
-        if form.is_valid():
-            form.save()
+        if len(request.FILES) != 0:
+            path = os.path.normpath(profile.image.path).split(os.path.sep)
+            new_path = os.path.join(*path[-1:])
+            if len(profile.image) > 0 and new_path != 'avatar.jpg':
+                os.remove(profile.image.path)
+            
+            profile.image = request.FILES['img']
+
+        print(profile.bio)
+        profile.bio = request.POST.get('bio')
+        print(profile.bio)
+        profile.save()
+
+        return redirect('home')
+
+    context = {'profile':profile}
+    return render(request, 'update_post.html', context)
+
+def registerPage(request):
+    user_form = CreateUserForm()
+
+    if request.method == 'POST':
+        user_form = CreateUserForm(request.POST)
+        if user_form.is_valid():
+            user_form.save()
+
+            username = user_form.cleaned_data["username"]
+
+            user = User.objects.get(username=username)
+            Profile.objects.create(user=user)   
+
             return redirect('home')
 
-    context = {'form':form}
+    context = {'user_form':user_form}
     return render(request, 'register.html', context)
 
 def loginPage(request):
@@ -92,7 +124,6 @@ def logoutUser(request):
     logout(request)
     return redirect('login')
 
-#if user is not login, he will be redirectered to the login page
 @login_required(login_url='/login/')
 def home(request):
     posts = Post.objects.all()
@@ -147,10 +178,12 @@ def profilePage(request, pk):
         for i in range(len(friends)):
             if int(friends[i].id) == int(pk):
                 guy_is_already = True
-        
+    
+    profile = Profile.objects.get(user_id=pk)
     user = User.objects.get(id=pk)
 
     chat_name = f"{user.username}"
 
-    context = {'user':user, 'friends':friends, 'is_friend':guy_is_already, 'chat_name' : chat_name}
+    context = {'user':user, 'friends':friends, 'is_friend':guy_is_already, 'chat_name' : chat_name, 'profile' : profile}
     return render(request, 'profile.html', context)
+

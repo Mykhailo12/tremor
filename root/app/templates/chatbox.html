@@ -2,48 +2,97 @@
 {% load static %}
 {% load app_profile %}
 {% block content %}  
+{% get_static_prefix as STATIC_PREFIX %}
 <html>
-    <div class="chat-room">
+    <div class="chat-room" id="chat-room">
         <p id="current_user">{{request.user}}</p>
-        
         <p id="sender">{{sender}}</p>
         <p id="receiver">{{receiver}}</p>
         {% for message in messages %}
             {% if message.sender.id != request.user.id %}
-                <div id="{{message.id}}h" class="his">
-                    {% get_static_prefix as STATIC_PREFIX %}
-                    <img class="chat-host-avatar" src="{{STATIC_PREFIX}}images/{% profile receiver %}">
-                    <div class="his-message-body">
-                        <p class="chat-log-sender">{{message.sender}}</p>
-                        <p id="{{message.id}}" class="chat-log-his">{{message.text}}</p>
-                    </div>
-                </div>
-            {% else %}
-                <div id="{{message.id}}m" class="my" atr="{{message.id}}" oncontextmenu="pkm(this.getAttribute('atr'), event)">
-                    <div class="my-message-body">
-                        <p id="{{message.id}}p" class="chat-log-my">{{message.text}}</p>
-                        <div class="my-message-created">
-                            <span >{{message.created|date:"H:i"}}</span>
+                {% if message.text != None %}
+                    <div id="{{message.id}}h" class="his">
+                        <img class="chat-host-avatar" src="{{STATIC_PREFIX}}images/{{receiver_profile.image}}">
+                        <div class="his-message-body" atr="{{message.id}}" oncontextmenu="pkm(this.getAttribute('atr'), event)">
+                            <p class="chat-log-sender">{{message.sender}}</p>
+                            <p id="{{message.id}}p" class="chat-log-his">{{message.text}}</p>
+                            <div class="his-message-created">
+                                <span>{{message.created|date:"H:i"}}</span>
+                            </div>
                         </div>
-                    </div>  
-                </div>
-
-                <div id="{{message.id}}" class="dropdown-content">
-                    <a atr="{{message.id}}" onclick="show_edit_btn(this.getAttribute('atr'))">Edit</a>
-                    <a atr="{{message.id}}" onclick="delete_message(this.getAttribute('atr'))">Delete</a>
-                    <a atr="{{message.text}}" id="{{message.id}}" onclick="copy_message(this.getAttribute('atr', 'id'))">Copy</a>
-                    <a>Reply</a>
-                    <a>Pin</a>
-                </div>
+                    </div>
+                    <div id="{{message.id}}" class="dropdown-content">
+                        <a atr="{{message.text}}" id="{{message.id}}" onclick="copy_message(this.getAttribute('atr', 'id'))">Copy</a>
+                        <a>Reply</a>
+                        <a>Pin</a>
+                    </div>
+                {% else %}
+                    <div class="his">
+                        <img class="chat-host-avatar" src="{{STATIC_PREFIX}}images/{{receiver_profile.image}}">
+                        <div class="his-img-body" atr="{{message.id}}" oncontextmenu="pkm(this.getAttribute('atr'), event)">
+                            <p class="chat-log-sender">{{message.sender}}</p>
+                            <img class="chat-img-his" src="{{STATIC_PREFIX}}images/{{message.image}}">
+                            <div class="his-message-created">
+                                <span>{{message.created|date:"H:i"}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="{{message.id}}" class="dropdown-content">
+                        <a atr="{{message.text}}" id="{{message.id}}" onclick="copy_message(this.getAttribute('atr', 'id'))">Copy</a>
+                        <a>Reply</a>
+                        <a>Pin</a>
+                    </div>
+                {% endif %}    
+            {% else %}
+                {% if message.text != None %}
+                    <div id="{{message.id}}m" class="my">
+                        <div class="my-message-body" atr="{{message.id}}" oncontextmenu="pkm(this.getAttribute('atr'), event)">
+                            <p id="{{message.id}}p" class="chat-log-my">{{message.text}}</p>
+                            <div class="my-message-created">
+                                <span >{{message.created|date:"H:i"}}</span>
+                            </div>
+                        </div>  
+                    </div>
+                    <div id="{{message.id}}" class="dropdown-content">
+                        <a atr="{{message.id}}" onclick="show_edit_btn(this.getAttribute('atr'))">Edit</a>
+                        <a atr="{{message.id}}" onclick="delete_message(this.getAttribute('atr'))">Delete</a>
+                        <a atr="{{message.text}}" id="{{message.id}}" onclick="copy_message(this.getAttribute('atr', 'id'))">Copy</a>
+                        <a>Reply</a>
+                        <a>Pin</a>
+                    </div>
+                {% else %}
+                    <div id="{{message.id}}m" class="my">
+                        <div class="my-img-body" atr="{{message.id}}" oncontextmenu="pkm(this.getAttribute('atr'), event)">
+                            <img class="chat-img-my" src="{{STATIC_PREFIX}}images/{{message.image}}">
+                            <div class="my-message-created">
+                                <span>{{message.created|date:"H:i"}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="{{message.id}}" class="dropdown-content">
+                        <a atr="{{message.id}}" onclick="delete_message(this.getAttribute('atr'))">Delete</a>
+                        <a>Reply</a>
+                        <a>Pin</a>
+                    </div>
+                {% endif %}
             {% endif %}
         {% endfor %}
         <div id="board" class="board"></div>
         <i id="scroll-bottom"></i>
     </div>
     <div class="chat-navigation">
+        <div class="file-upload-div" id="file-upload-div">
+            <img class="clip-svg" src="{% static 'images/clip-svgrepo-com.svg' %}">
+            <input class="file-upload-input" id="file-upload-input" type="file" />
+        </div>
         <textarea class="chat-input" id="chat-message-input" type="text"></textarea>    
         <input class="chat-submit" id="chat-message-submit" type="button" value="Send">
         <input class="chat-edit" id="chat-message-edit" type="button" onclick="edit_click()" value="Edit" style="display:none;">
+    </div>
+    <div class="send-img-alert" id="send-img-alert">
+        <img src="" class="send-img" id="image-send">
+        <input class="cancel-img-submit" id="cancel-img-submit" type="submit" value="cancel">
+        <input class="send-img-submit" id="send-img-submit" type="submit" value="send">
     </div>
     {{ room_name|json_script:"room-name" }}
     <script>
@@ -52,31 +101,146 @@
         const sender = document.getElementById('sender').textContent;
         const receiver = document.getElementById('receiver').textContent;
 
+        const cancelImgSendInput = document.getElementById('cancel-img-submit')
+        const imgSendInput = document.getElementById('send-img-submit')
+
+        const uploadBlock = document.getElementById('file-upload-div');
+        const imageInput = document.getElementById('file-upload-input');
+
+        const sendImgAlert = document.getElementById('send-img-alert');
+
+        const chatRoom = document.getElementById('chat-room');
+
+        let today = new Date();
+        let time = today.getFullYear() + "69" + (today.getMonth()+1) + "69" + today.getDate() + "69" + today.getHours() + "69" + today.getMinutes() + "69" + today.getSeconds();
+
+        console.log(time.toLocaleString())
+
         let count = 0;
 
+        let image_url = '';
         let msg_id;
 
         location.href = '#scroll-bottom';
+        
+        cancelImgSendInput.addEventListener('click', function() {
+            sendImgAlert.style.display = 'none';
+        });
+
+        uploadBlock.addEventListener('click', function() {
+            imageInput.click();
+        });
+
+        document.getElementById('file-upload-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                sendImgAlert.style.display = "block"
+
+                reader.onload = function(e) {
+                    let imageSend = document.getElementById('image-send');
+
+                    image_url = e.target.result;
+                    imageSend.src = image_url;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
 
         $('#chat-message-input').on('input', function(){
 	        this.style.height = '50px';
-
 	        this.style.height = (this.scrollHeight + 6) + 'px'; 
         });
 
-        function pkm(id, e){
-            let cursor_x = e.clientX;
+        function scrolling_perms(block, arg) {
+            console.log(arg)
+            if(arg === "enable") {
+                chatRoom.style.overflow = 'auto';
+                chatRoom.style.paddingRight = "0px";
+            } else if (arg === "disable") {
+                chatRoom.style.overflow = 'hidden';
+                chatRoom.style.paddingRight = "10px";
+            }
+        }
+
+        function handleMouseMove(event, id, start_x, start_y, dropdown) {
+            let x = event.clientX;
+            let y = event.clientY;
+        
+            if ((start_x-400) > x || x > (start_x+400) || (start_y-400) > y || y > (start_y+400)) {
+                dropdown.style.display = 'none';
+                if(count > 0) {
+                    count -= 1;
+                    scrolling_perms(chatRoom, "enable")
+                }
+            }
+        }
+
+        function pkm(id, event){
+            let x = event.clientX;
+            let y = event.clientY;
+
+            console.log(`start_x: ${x} start_y: ${y}`)
+
+            const chatRoomRect = chatRoom.getBoundingClientRect();
+            const maxYChatRoom = chatRoomRect.bottom;
+            const chatRoomHeight = chatRoom.offsetHeight;
+
+            const windowHeight = window.innerHeight;
+
+            const dropdown = document.getElementById(id);
+
+            dropdown.style.display = 'block';
+            const dropdownHeight = dropdown.offsetHeight;
+            dropdown.style.display = 'none';
+
+            console.log("dropdown height: " + dropdownHeight)
+
             if(count == 0) {
                 event.preventDefault();
-                document.getElementById(id).style.display = "block";
-                document.getElementById(id).style.marginLeft = cursor_x + "px";
-                count += 1;
+                console.log("max y chat room: " + maxYChatRoom)
+                if((y + dropdownHeight) > maxYChatRoom) {
+                    if((windowHeight/100)*70 < chatRoomHeight) {
+                        console.log("chatroom is big blyat")
+                        dropdown.style.display = 'block';
+                        dropdown.style.left = x + 5 + "px";
+                        dropdown.style.top = y - dropdownHeight + "px";
+                        count += 1;
+                        scrolling_perms(chatRoom, "disable")
+                    } else {
+                        dropdown.style.display = 'block';
+                        dropdown.style.left = x + 5 + "px";
+                        dropdown.style.top = y - (dropdownHeight) + "px";
+                        count += 1;
+                    }
+                } else {
+                    console.log("gogogogo")
+                    if((windowHeight/100)*85 < chatRoomHeight) {
+                        console.log("chatroom is big blyat")
+                        dropdown.style.display = 'block';
+                        dropdown.style.left = x + 5 + "px";
+                        dropdown.style.top = y + (dropdownHeight) + "px";
+                        scrolling_perms(chatRoom, "disable")
+                        count += 1;
+                    } else {
+                        console.log("opa")
+                        dropdown.style.display = 'block';
+                        dropdown.style.left = x + 5 + "px";
+                        dropdown.style.top = y + "px";
+                        count += 1;
+                    }
+                }
+
+                window.addEventListener('mousemove', (event) => {
+                    handleMouseMove(event, id, x, y, dropdown);
+                });
             }
-            console.log(e.clientX);
         }
 
         window.onclick = function(event) {
-            if (!event.target.matches('.my')) {
                 var dropdowns = document.getElementsByClassName("dropdown-content");
                 var i;
                 for (i = 0; i < dropdowns.length; i++) {
@@ -84,9 +248,9 @@
                     if (openDropdown.style.display == "block") {
                         openDropdown.style.display = "none";
                         count -= 1;
+                        scrolling_perms(chatRoom, "enable")
                     }
                 }
-            }
         }  
 
         function delete_message(id) {
@@ -123,8 +287,6 @@
 
             msg_id = id;
         }
-
-        console.log('local id', msg_id)
 
         function edit_click() {
             const messageInputDom = document.querySelector('#chat-message-input');
@@ -164,15 +326,10 @@
             console.log('data', data)
 
             if(data.edited_message != null) {
-                msg_id = data.id
-                console.log('ed', data.edited_message, msg_id)
-                msg_p = document.getElementById(msg_id + 'm')
-                //console.log('msg_p', msg_p.textContent)
-                console.log('msg_p', msg_p)
-                msg_p.textContent = data.sender + ': ' + data.edited_message;
-                msg_id = 0;  
-            } else if (data.message != null) {
-                console.log('message else')
+                msg_p = document.getElementById(data.id + 'p')
+                msg_p.textContent = data.edited_message;
+            } else if (data.message != undefined) {
+                console.log(data.message)
                 let atr = "'atr'"
                 let id = "'id'"
                 const text_box_my = '<div id="'+ data.id +'m" class="my" atr="'+ data.id +'" oncontextmenu="pkm(this.getAttribute('+ atr + '), event)">' +
@@ -197,6 +354,13 @@
                         '<p class="chat-log-sender">' + data.sender + '</p>' +
                         '<p id="' + data.id + '" class="chat-log-his">' + data.message + '</p>' +
                     '</div>' +  
+                '</div>' +
+                '<div id="'+ data.id +'" class="dropdown-content">' +
+                    '<a atr="'+ data.id +'" onclick="show_edit_btn(this.getAttribute(' + atr + '))">Edit</a>' +
+                    '<a atr="'+ data.id +'" onclick="delete_message(this.getAttribute(' + atr +'))">Delete</a>' +
+                    '<a atr="'+ data.message +'" id="'+ data.id +'" onclick="copy_message(this.getAttribute(' + atr + ',' + id + '))">Copy</a>' +
+                    '<a>Reply</a>' +
+                    '<a>Pin</a>' +
                 '</div>'
 
                 if(curr_user != data.sender) {
@@ -213,8 +377,37 @@
 
                 let msgg = document.getElementById(msg_id + "h");
                 msgg.remove()
-            }
-        };
+            } else if (data.image_url != null) {
+                console.log(data.image_url, "image_url")
+                const myImage = '<div class="my">'+
+                    '<div class="my-img-body">' +
+                        '<img class="chat-img-my" src="' + data.image_url + '">' +
+                        '<div class="my-message-created">' +
+                            '<span>'+ data.created + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' 
+
+                const hisImage = '<div class="his">'+
+                    '<img class="chat-host-avatar" src="{{STATIC_PREFIX}}images/{{receiver_profile.image}}">' +
+                    '<div class="his-img-body">' +
+                        '<p class="chat-log-sender">' + data.sender + '</p>'+
+                        '<img class="chat-img-his" src="' + data.image_url + '">' +
+                        '<div class="his-message-created">' +
+                            '<span>'+ data.created + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' 
+
+                if(curr_user != data.sender) {
+                    board.innerHTML += hisImage;
+                    location.href = '#scroll-bottom';
+                } else {
+                    board.innerHTML += myImage;
+                    location.href = '#scroll-bottom';
+                }
+            };
+        }
 
         chatSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
@@ -237,19 +430,43 @@
             document.querySelector('#chat-message-input').style.height = '54px';
             
             location.href = '#scroll-bottom';
+            
+            console.log(image_url)
 
             console.log(message)
             if(message.trim() != '') {
-                chatSocket.send(JSON.stringify({
-                    'message': message,
-                    'sender' : sender,
-                    'receiver' : receiver,
-                    'deleted_message_id' : null,
-                    'edited_message': null,
-                }));
+                chatSocket.send(
+                    JSON.stringify({
+                        'message': message,
+                        'sender' : sender,
+                        'receiver' : receiver,
+                        'deleted_message_id' : null,
+                        'edited_message': null,
+                    })
+                );
+                console.log("message sended")
                 messageInputDom.value = '';
             }
         };
+
+        imgSendInput.onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            console.log(message);
+            chatSocket.send(
+                    JSON.stringify({
+                        'message': null,
+                        'sender' : sender,
+                        'receiver' : receiver,
+                        'deleted_message_id' : null,
+                        'edited_message': null,
+                        'image_url' : image_url,
+                        'time' : time,
+                    })
+                );
+
+            sendImgAlert.style.display = 'none'
+        }
     </script>
 </html>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends 'main.html' %}
 {% block content %}  
     <h3>Friends:</h3>
-    {% if friends %}
+    {% if friends != None %}
         {% for friend in friends %}
             <a href="{% url 'profile' friend.id %}">{{friend.username}}</a>
             <a href="{% url 'change_friends' operation='remove' pk=friend.pk %}">

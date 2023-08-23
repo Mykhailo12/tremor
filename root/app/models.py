@@ -33,9 +33,10 @@ class Friend(models.Model):
         friend.users.remove(new_friend)
 
 class Message(models.Model):
-    text = models.TextField(max_length=2000, blank=True)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', blank=True, default="None") 
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', blank=True, default="None") 
+    text = models.TextField(max_length=2000, blank=True, null=True)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', default="None") 
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', default="None")
+    image = models.ImageField(upload_to="uploads/", verbose_name="message image", null=True, blank=True) 
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(default=timezone.now)
     seen = models.BooleanField(default=False)

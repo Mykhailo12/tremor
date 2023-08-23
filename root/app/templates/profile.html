@@ -1,6 +1,6 @@
 {% extends 'main.html' %}
 {% block content %}
-    {% if user == request.user %}
+    {% if user == request.user and user.is_superuser != True %}
         <h3>{{user.username}}</h3>
         <p>{{profile.bio}}</p>
         <a href="{% url 'update_profile' user.id %}">update profile</a>

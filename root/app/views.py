@@ -15,11 +15,13 @@ def room(request, room_name):
     sender=request.user 
     receiver=User.objects.get(username=room_name)
 
-    messages = reversed(Message.objects.filter(receiver=receiver, sender=sender)|Message.objects.filter(receiver=sender, sender=receiver))
+    messages = reversed(Message.objects.filter(receiver=receiver, sender=sender).select_related('receiver', 'sender')|Message.objects.filter(receiver=sender, sender=receiver).select_related('receiver', 'sender'))
+
+    receiver_profile = Profile.objects.get(user = receiver)
 
     print(type(messages))
 
-    return render(request, "chatbox.html", {"room_name": room_name, 'sender':sender, 'receiver':receiver, 'messages':messages})
+    return render(request, "chatbox.html", {"room_name": room_name, 'sender':sender, 'receiver':receiver, 'messages':messages, 'receiver_profile' : receiver_profile})
 
 @login_required(login_url='login')
 def createPost(request):
@@ -77,8 +79,8 @@ def updateProfile(request, pk):
             
             profile.image = request.FILES['img']
 
-        print(profile.bio)
-        profile.bio = request.POST.get('bio')
+        print(request.POST)
+        profile.bio = request.POST.get('text')
         print(profile.bio)
         profile.save()
 
@@ -126,7 +128,7 @@ def logoutUser(request):
 
 @login_required(login_url='/login/')
 def home(request):
-    posts = Post.objects.all()
+    posts = Post.objects.all().select_related('host')
     is_post = False
     if len(posts) > 0:
         is_post = True
@@ -136,10 +138,8 @@ def home(request):
 
 def friendsPage(request):
     try:
-        friend = Friend.objects.get(current_user = request.user)
-        friends = friend.users.all()
+        friends = Friend.objects.get(current_user = request.user).users.all().values('id', 'username', 'pk')
         context = {'friends':friends}
-
     except Friend.DoesNotExist:
         text = 'No friends yet.'
         friends = None
@@ -167,6 +167,8 @@ def peoplesPage(request):
     return render(request, 'peoples.html', context)
 
 def profilePage(request, pk):
+    user = User.objects.get(id=pk)
+    
     try:
         friend = Friend.objects.get(current_user = request.user)
         friends = friend.users.all()
@@ -179,8 +181,10 @@ def profilePage(request, pk):
             if int(friends[i].id) == int(pk):
                 guy_is_already = True
     
-    profile = Profile.objects.get(user_id=pk)
-    user = User.objects.get(id=pk)
+    if user.is_superuser != True:
+        profile = Profile.objects.get(user_id=pk)
+    else: 
+        profile = None
 
     chat_name = f"{user.username}"
 

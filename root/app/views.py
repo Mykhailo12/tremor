@@ -1,4 +1,5 @@
 import os
+import math
 from django.shortcuts import render, redirect
 from .forms import CreateUserForm, PostForm, ProfileForm
 from django.contrib.auth import authenticate, login, logout
@@ -6,6 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Friend, Post, Message, Profile
 from django.http import HttpResponse
+from django.core.paginator import Paginator
+from django.forms.models import model_to_dict
+
 
 @login_required(login_url='login')
 def room(request, room_name):
@@ -16,10 +20,8 @@ def room(request, room_name):
     receiver=User.objects.get(username=room_name)
 
     messages = reversed(Message.objects.filter(receiver=receiver, sender=sender).select_related('receiver', 'sender')|Message.objects.filter(receiver=sender, sender=receiver).select_related('receiver', 'sender'))
-
+    
     receiver_profile = Profile.objects.get(user = receiver)
-
-    print(type(messages))
 
     return render(request, "chatbox.html", {"room_name": room_name, 'sender':sender, 'receiver':receiver, 'messages':messages, 'receiver_profile' : receiver_profile})
 
@@ -28,11 +30,18 @@ def createPost(request):
     form = PostForm()
 
     if request.method == 'POST':
-        Post.objects.create(
-            host=request.user,
-            text=request.POST.get('text'),
-            img=request.FILES['img'],
-        )
+        if len(request.FILES) != 0:
+            Post.objects.create(
+                host=request.user,
+                text=request.POST.get('text'),
+                img=request.FILES['img'],
+            )
+        else:
+            Post.objects.create(
+                host=request.user,
+                text=request.POST.get('text'),
+                img=None,
+            )
         return redirect('home')
 
     context = {'form':form}
@@ -40,14 +49,14 @@ def createPost(request):
 
 @login_required(login_url='login')
 def updatePost(request, pk):
-    post = Post.objects.get(id=pk)    
+    post = Post.objects.get(id=pk)   
 
     if request.user != post.host:
         return HttpResponse("Your are not allowed here!!")
 
     if request.method == 'POST':
         if len(request.FILES) != 0:
-            if len(post.img) > 0:
+            if post.img != '':
                 os.remove(post.img.path)
             post.img = request.FILES['img']
         post.text = request.POST.get('text', None)
@@ -62,6 +71,13 @@ def updatePost(request, pk):
 
     context = {'post':post}
     return render(request, 'update_post.html', context)
+
+@login_required(login_url='login')
+def deletePost(request, pk):
+    Post.objects.filter(id=pk).delete()
+
+    return redirect('home')
+    
 
 @login_required(login_url='login')
 def updateProfile(request, pk):
@@ -128,13 +144,46 @@ def logoutUser(request):
 
 @login_required(login_url='/login/')
 def home(request):
-    posts = Post.objects.all().select_related('host')
+    posts = Post.objects.all()
+
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get('page', 1)
+    max_page_num = math.ceil(posts.count()/5)
+
+    posts = paginator.get_page(page_number)
+
+    user = request.user
+    liked_posts = Post.objects.filter(likes=user)
+
     is_post = False
     if len(posts) > 0:
         is_post = True
 
-    context={'posts' : posts, 'is_post' : is_post}
-    return render(request, 'home.html', context)
+    context={'page_number' : page_number, 'max_page_num':max_page_num, 'is_post' : is_post, 'liked_posts' : liked_posts, 'posts': posts}
+    if max_page_num >= int(page_number):
+        if request.htmx:
+            print(request.htmx)
+            return render(request, "posts.html", context)
+    else: 
+        return HttpResponse('')
+
+    return render(request, "home.html", context)
+
+@login_required(login_url='/login/')
+def getComment(request, pk):
+    post = Post.objects.get(id=pk)
+
+    paginator = Paginator(post.comments.all(), 5)
+    page_number = request.GET.get('page', 1)
+
+    comments = paginator.get_page(page_number)
+
+    for comment in comments:
+        print(comment.text)
+
+    context = {'comments': comments, 'page_number' : page_number, 'id' : pk}
+
+    return render(request, "get_comment.html", context)
 
 def friendsPage(request):
     try:
@@ -160,6 +209,7 @@ def peoplesPage(request):
     search_query = request.GET.get('search', '')
     
     if search_query:
+        print(search_query)
         users = User.objects.filter(username__icontains=search_query)
     else:
         users = None

@@ -1,0 +1,8 @@
+{% for comment in comments %}
+    <div class="comment-bar">
+        <img src="" class="comment-bar-avatar" id="comment-bar-avatar">
+        <p class="comment-bar-host" id="comment-bar-host">{{comment.host.username}}</p>
+        <p class="comment-bar-text" id="comment-bar-text">{{comment.text}}</p>
+        <hr color="white" style="margin: 20px;">
+    </div>
+{%  %}

@@ -6,7 +6,6 @@
     --breakpoint-xl: 1200px;
     --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; 
-    --post-block-width: 
 }
 
 a {
@@ -23,6 +22,10 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     background-color: #202124 !important;
     color: white !important;
+    overflow: auto;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .post {
@@ -31,6 +34,7 @@ body {
     margin-top: 20px;
     border-radius: 5px;
     width: 35vw;
+    padding: 10px;
 }
 
 textarea {
@@ -38,8 +42,9 @@ textarea {
     height: 200px;
 }
 
-.my {
+.my {   
     min-height: 77.325px;
+    margin: 2.5px;
 }
 
 .my p {
@@ -57,7 +62,7 @@ textarea {
     border-radius: 5px;
     border: 1px solid black;
     float: right;
-    max-width: 70%;
+    max-width: 50%;
     min-height: 30px;
     min-width: 40px;
     padding: 5px;
@@ -136,6 +141,86 @@ textarea {
     float: left;
 }
 
+.blur-container {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(1.5px);
+    z-index: 999;
+    display: none;
+}
+
+.modal-close {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    left: 90%;
+    z-index: 1000;
+    display: none;
+}
+
+.modal-close:hover {
+    cursor: pointer;
+}
+
+.modal-container {
+    width: 70%;
+    height: 90%;
+    max-width: 70vw;
+    display: none;
+    grid-template-columns: auto 1fr;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    color: white;
+}
+
+.modal-left, .modal-right {
+    flex-grow: 1;
+    box-sizing: border-box;
+    overflow: hidden; 
+}
+
+.modal-left {
+    background-color: #303134;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid white;
+    min-width: none;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-left img {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    margin: 0px;
+}
+
+.modal-right {
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: #303134;
+    flex-direction: column;
+    overflow-y: scroll; /* Додано прокрутку по вертикалі */
+    max-height: 100%; /* Задано фіксовану висоту (при потребі встановіть власну висоту) */
+}
+
+
+.detail-content {
+    padding: 20px 20px 0px 20px;
+}
+
 .my-message-created{
     font-size: 15px;
     padding: 0px;
@@ -157,21 +242,17 @@ textarea {
 }   
 
 .his {
-    float: bottom;
     min-height: 77.325px;   
-    max-width: 70%;
+    margin: 2.5px;
 }
 
 .his p {
     text-align: left;
     word-wrap: break-word;
-    max-width: 400px;
+    max-width: 445.275px;
     min-width: 100px;
-    padding-bottom: 0px;
-    padding-top: 5px;
-    padding-right: 15px;
-    margin-top: 0px;
-
+    padding: 5px;
+    padding-left: 15px;
 }
 
 .his-message-body {
@@ -180,11 +261,12 @@ textarea {
     border: 1px solid black;
     float: left;
     position: relative;
+    padding: 5px;
     padding-bottom: 20px;
-    max-width: 70%;
+    max-width: 50%;
     min-width: 60px;
     min-height: 30px;
-    margin: 1px 0px 1px 0px;
+    margin: 1px 10px 1px 0px;
 }
 
 .chat-room {
@@ -194,7 +276,6 @@ textarea {
     display: grid;
     grid-template-columns: auto;
     margin: 30px auto 0px auto;
-    border-radius: 10px;
     overflow: auto;
     padding-bottom: 10px;
     padding-right: 0px;
@@ -241,8 +322,11 @@ textarea {
     max-height: 150px;
 }
 
-.board {
-    height: 100%;
+.bottom-board {
+    display: grid;
+}
+
+.top-board {
     display: grid;
 }
 
@@ -250,6 +334,13 @@ textarea {
     width: 50px;
     height: 50px;
     margin: 2px 0px 5px 18px;
+}
+
+.three-dots-svg {
+    float: right;
+    width: 33px;
+    height: 33px;
+    margin: 15px 10px 15px 10px;
 }
 
 .file-upload-div {
@@ -269,6 +360,30 @@ textarea {
     visibility: hidden;
 }
 
+.comment-input-container {
+    width: 50%;
+    height: 50px;
+    float: right;
+    position: absolute;
+    margin: auto;
+    right: 0;
+    bottom: 0;
+}
+
+.comment-input {
+    width: 80%;
+    height: 50px;
+    float: left;
+    resize: none;
+    margin: auto;
+    padding: 0px;
+}
+
+.comment-submit {
+    width: 20%;
+    height: 50px;
+}
+
 .chat-submit {
     width: 10%;
     float: right;
@@ -276,23 +391,103 @@ textarea {
 }
 
 .chat-edit {
+    display: none;
     float: right;
     width: 10%;
     height: 54px;
 }
 
+.chat-reply {
+    display: none;
+    float: right;
+    width: 10%;
+    height: 54px;
+}
+
+.chat-reply-block {
+    display: none;
+    align-items: flex-start;
+    width: 60%;
+    height: 60px;
+    margin: auto;
+    background-color: grey;
+}
+
+.p-upper {
+    margin: 0px 10px 0px 5px;
+}
+
+.p-lower {
+    margin: 5px 5px 0px 5px;
+    max-width: 400px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.close-svg {
+    width: 50px;
+    height: 50px;
+    margin: 5px 23px 5px auto;
+}
+
+.close-svg:hover {
+    width: 50px;
+    height: 50px;
+    margin: 5px 23px 5px auto;
+    filter: drop-shadow( 1px 1px 0px rgba(0, 0, 0, .5));
+}
+
 .chat-log-my{
     color: white;
-    margin: 5px 5px 5px 10px;
+    margin: 5px 5px 5px -10px;
     font-size: 20px;
+    float: right
+}
+
+.chat-reply-log-my {
+    color: white;
+    margin: 10px 0px 0px 0px;
+    font-size: 17px;
     float: right;
+    line-height: 1;
+    border-left: 3px solid white; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+
+.chat-reply-log-my img{
+    width: 50px;
+    height: 50px;
+}
+
+.chat-reply-log-his img{
+    width: 50px;
+    height: 50px;
+}
+
+.chat-reply-log-his {
+    color: white;
+    margin: 10px 0px 0px 10px;
+    font-size: 17px;
+    float: left;
+    line-height: 1;
+    border-left: 3px solid white; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    width: 97%;
 }
 
 .chat-log-his{
     color: white;
-    margin: 5px 5px 5px 10px;
+    margin: 10px 10px 5px -5px;
+    margin-top: 10px !important;
     font-size: 20px;
     float: left;
+    clear: both;
+    width: 97%;
 }
 
 .chat-log-sender {
@@ -303,18 +498,43 @@ textarea {
     margin: 0px 0px 0px 10px;
 }
 
+.dots-dropdown-menu {
+    display: none;
+    position: fixed;
+    background-color: #808080;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); 
+    min-width: 50px;
+}
+
+.dots-dropdown-menu a{
+    padding: 6px 8px;
+    text-decoration: none;
+    display: block;
+    position: relative;
+    color: white;
+    font-size: 15px;
+}
+
+.dots-dropdown-menu a:hover {
+    background-color: #C0C0C0;
+    padding: 6px 8px;
+    text-decoration: none;
+    font-size: 15px;
+}
+
 .dropdown-content {
     display: none;
     position: absolute;
     background-color: #808080;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1; 
     min-width: 100px;
-    max-height: 200px;
+    max-height: 500px;
+    z-index: 100;
 }
   
 .dropdown-content a {
     padding: 6px 8px;
+    z-index: 1;
     text-decoration: none;
     display: block;
     font-size: 15px;
@@ -324,7 +544,6 @@ textarea {
     background-color: #C0C0C0;
     padding: 6px 8px;
     text-decoration: none;
-    display: block;
     font-size: 15px;
 }
 
@@ -381,9 +600,9 @@ textarea {
 .post-created {
     font-size: 10px;
     white-space: nowrap;
-    position: absolute;
-    margin-top: -38px;
-    margin-left: 120px;
+    position: relative;
+    margin-top: -22px;
+    float: right;
     color: #636363;
 }
 
@@ -403,12 +622,58 @@ textarea {
     height: 50px;
 }
 
+.comment-bar-host {
+    margin: 0px 0px 10px 10px;
+    float: left;
+}
+
+.comment-bar-avatar {
+    list-style-type: none; 
+    text-decoration: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    white-space: nowrap;
+    float: left;
+    margin: 0px 0px 10px 10px;
+}
+
+.comment-bar-text {
+    margin: 20px 10px 10px 10px;
+    font-size: 15px;
+    text-overflow: ellipsis;
+    overflow: hidden; 
+    width: 100%;
+}
+
+.comment-bar {
+    width:100%;
+}
+
 .post-text {
-    margin: 10px;
+    margin: 20px 10px 10px 10px;
+    font-size: 15px;
+
+    text-overflow: ellipsis;
+    overflow: hidden; 
+}
+
+.read-more-text {
+    font-size: 15px;
+    color: #5D5D5D;
+    margin: 0px;
+    text-decoration: underline;
+    display: none;
+}
+
+.read-more-text:hover {
+    font-size: 15px;
+    color: grey;
+    cursor: pointer;
 }
 
 .post-host {
-    position: absolute;
+    position: flex;
     margin-top: -55px;
     margin-left: 70px;
 }
@@ -423,9 +688,10 @@ textarea {
 
 .post-img {
     position: relative;
-    margin: 1.7%;
+    margin: auto auto 20px auto;
+
     object-fit: cover;
-    width: 33.8vw;
+    width: 100%;
     height: 100%;
 }
 
@@ -510,6 +776,40 @@ textarea {
     height: 25px;
     margin-top: 0px;
     margin-bottom: 4px;
+}
+
+.plus-svg-container {
+    width: 100%;
+    height: 50px;
+    margin-bottom: 60px;
+}
+
+.plus-svg-container img {
+    width: 50px;
+    height: 50px;
+    margin-left: 42%;
+}
+
+.heart-regular-svg {
+    width: 25px;
+    height: 25px;
+    margin: 0px 5px 10px 5px;
+}
+
+.like-and-comment-container {
+    display: flex;
+}
+
+.heart-solid-svg {
+    width: 25px;
+    height: 25px;
+    margin: 0px 5px 10px 5px;
+}
+
+.comment-svg {
+    width: 25px;
+    height: 25px;
+    margin: 0px 5px 10px 20px;
 }
 
 .no-posts-text {

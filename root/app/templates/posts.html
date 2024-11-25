@@ -1,0 +1,46 @@
+{% load static %}
+{% load app_profile %}
+
+{% if is_post == True %}
+    {% for post in posts %}
+        <div class="post" id="{{post.id}}">
+            {% if post.host == request.user %}
+                <img src="{% static 'images/three-dots-line-svgrepo-com.svg' %}" atr="{{post.id}}" id="{{post.id}}d" onclick="dots_click(this.getAttribute('atr'))" class="three-dots-svg" tabindex="0"/>
+            {% endif %}
+            <img src="{{STATIC_PREFIX}}images/{% profile post.host %}" id="post-avatar-{{post.id}}" class="user-host-img"><h3 class="post-host" id="post-host-{{post.id}}">{{post.host.username}}</h3><h3 class="post-created" id="post-created-{{post.id}}">{{ post.created|date:"D, H:i" }}</h3>
+            <h3 class="post-text" id="post-text-{{post.id}}">{{post.text}}</h3>
+            {% if post.img != '' %}
+                <img src="static{{post.img.url}}" id="post-img-{{post.id}}" class="post-img">
+            {% endif %}
+            <br>
+            <div class="like-and-comment-container">
+                {% if post in liked_posts %}
+                    <a atr="{{post.id}}" id="a_{{post.id}}_liked" onclick="like(this.getAttribute('atr'))">
+                        <img src="{% static 'images/heart-like-svgrepo-com-full.svg' %}" id="post_svg_{{post.id}}_liked" class="heart-solid-svg"/>
+                    </a>
+                    <p id="post_count_{{post.id}}">{{ post.likes.count }}</p>
+                {% else %}
+                    <a atr="{{post.id}}" id="a_{{post.id}}" onclick="like(this.getAttribute('atr'))">
+                        <img src="{% static 'images/heart-like-svgrepo-com.svg' %}" id="post_svg_{{post.id}}" class="heart-solid-svg"/>
+                    </a>
+                    <p id="post_count_{{post.id}}">{{ post.likes.count }}</p>
+                {% endif %}
+                <i atr="{{post.id}}" onclick="showModal(this.getAttribute('atr'), event)">
+                    <img src="{% static 'images/comment-3-svgrepo-com.svg' %}" class="comment-svg"/>
+                </i>
+            </div>
+            <div class="dots-dropdown-menu" id="{{post.id}}dropdown">
+                <a href="{% url 'delete' post.id %}">Delete</a>
+                <a href="{% url 'update' post.id %}">Edit</a>
+            </div>
+        </div>
+    {% endfor %} 
+    <div hx-get="http://127.0.0.1:8000/?page={{ page_number|add:1 }}" 
+     hx-trigger="revealed" 
+     hx-target="this"
+     hx-swap="outerHTML">
+    </div>
+
+    <br>
+
+{% endif %}

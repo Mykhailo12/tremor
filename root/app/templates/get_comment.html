@@ -1,0 +1,16 @@
+{% load static %}
+{% load app_profile %}
+
+{% for comment in comments %}
+    <div class="comment-bar">
+        <img src="" class="comment-bar-avatar" id="comment-bar-avatar">
+        <p class="comment-bar-host" id="comment-bar-host">{{comment.host.username}}</p>
+        <p class="comment-bar-text" id="comment-bar-text">{{comment.text}}</p>
+        <hr color="white" style="margin: 20px;">
+    </div>
+    <div hx-get="http://127.0.0.1:8000/getcomment/{{id}}/?page={{ page_number|add:1 }}" 
+     hx-trigger="revealed" 
+     hx-target="this"
+     hx-swap="outerHTML">
+    </div>
+{% endfor %}

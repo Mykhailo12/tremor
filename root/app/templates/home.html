@@ -1,23 +1,274 @@
 {% extends 'main.html' %}
 {% load static %}
+{% load app_profile %}
+{% get_static_prefix as STATIC_PREFIX %}
 {% block content %}
 <div class="post-create-div">
     <a href="{% url 'create' %}" class="post-create-text"><img src="{% static 'images/plus-square-svgrepo-com.svg' %}" class="plus-svg"/></i> Add post</a></h2>
 </div>
-{% if is_post == True %}
-    {% for post in posts %}
-        <div class="post">
-            <img src="{% static 'images/uploads/avatar.jpg' %}" class="user-host-img"><h3 class="post-host">{{post.host}}</h3><h3 class="post-created">{{ post.created|date:"D, H:i" }}</h3>
-            <h3 class="post-text">{{post.text}}</h3>
-            <img src="static{{post.img.url}}" class="post-img">
-            <br>
-            {% if post.host == request.user %}
-                <a href="{% url 'update' post.id %}" class="update-text">Update</a>
-            {% endif %}
+    {% include 'templates/posts.html' %}
+    <img src="{% static 'images/close-svgrepo-white-com.svg' %}" class="modal-close" id="modal-close" onclick="closeModal(event)"/>
+    <div class="modal-container" id="modal-container">
+        <div class="modal-left">
+            <img src="" class="detail-img" id="modal-post-img">
         </div>
-    {% endfor %}
-{% else %}
-    <h3 class="no-posts-text">You have no publications now</h3>
-{% endif %}
+        <div class="modal-right">
+            <div class="detail-content">
+                <img src="" class="user-host-img" id="modal-post-avatar"><h3 class="post-host" id="modal-post-host">hui123213123123123123</h3><h3 class="post-created" id="modal-post-created">121o32kr23</h3>
+                <p class="post-text" id="modal-post-text">Lorem aaaaaaaaaaaaaa dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repssssssudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit, tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit, quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos  sapiente officiis modi at sunt excepturi expedita sint? Sed quibusdam recusandae alias error harum maxime adipisci amet laborum. Perspiciatis  minima nesciunt dolorem! Officiis iure rerum voluptates a cumque velit  quibusdam sed amet tempora. Sit laborum ab, eius fugit doloribus tenetur  fugiat, temporibus enim commodi iusto libero magni deleniti quod quam  consequuntur! Commodi minima excepturi repudiandae velit hic maxime doloremque. Quaerat provident commodi consectetur veniam similique ad  earum omnis ipsum saepe, voluptas, hic voluptates pariatur est explicabo  fugiat, dolorum eligendi quam cupiditate excepturi mollitia maiores labore  suscipit quas? Nulla, placeat. Voluptatem quaerat non architecto ab laudantium modi minima sunt esse temporibus sint culpa, recusandae aliquam numquam  totam ratione voluptas quod exercitationem fuga. Possimus quis earum veniam  quasi aliquam eligendi, placeat qui corporis!</p>
+                <p class="read-more-text" onclick="toggleReadMore()" id="read-more-text">Read more</p>
+                <hr color="white">
+            </div>
+            <div class="comments-container" id="comments-container">
+            </div>
+            <div class="plus-svg-container">            
+                <img src="{% static 'images/plus-square-svgrepo-com.svg' %}" onclick="loadComments()" id="comments-load-svg">
+            </div>
+            <div class="comment-input-container">
+                <textarea type="text" class="comment-input" id="comment-input"></textarea>
+                <input type="button" class="comment-submit" id="comment-submit" value="Send">
+            </div>
+        </div>
+    </div>
+<script>
+    let data={};
+
+    const commentInput = document.getElementById("comment-input");
+
+    const host = document.getElementById('host-nav').textContent;
+    
+    let postHost;
+    let postAvatar;
+
+    const modalContainer = document.getElementById('modal-container');
+    const blurContainer = document.getElementById('blur-container');
+    const modalClose = document.getElementById('modal-close');
+
+    const commentsContainer = document.getElementById('comments-container');
+    const commentsLoadSvg = document.getElementById('comments-load-svg');
+
+    let modalPostHost = document.getElementById('modal-post-host');
+    let modalPostAvatar = document.getElementById('modal-post-avatar');
+    let modalPostText = document.getElementById('modal-post-text');
+    let modalPostImg = document.getElementById('modal-post-img');
+    let modalPostCreated = document.getElementById('modal-post-created');
+
+    const readMoreText = document.getElementById('read-more-text');
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/'
+        + host
+        + '/'
+    );
+
+    let post_id;
+
+    let count = 0;
+
+    let comments_load_count = 0;
+
+    function insertNewComment(id, post_host, text, postAvatar) {
+        console.log(postAvatar)
+        commentsContainer.innerHTML += '<div class="comment-bar">' +
+                                            '<img src="static/images/'+ postAvatar +'" class="comment-bar-avatar" id="comment-bar-avatar">' +
+                                            '<p class="comment-bar-host" id="comment-bar-host">'+ post_host +'</p>'+
+                                            '<p class="comment-bar-text" id="comment-bar-text">'+ text + id +'</p>'+
+                                            '<hr color="white" style="margin: 20px;">' +
+                                            '</div>'
+    }
+
+    function loadComments(){
+        chatSocketSend("load_comments", {"comments_load_count" : comments_load_count})
+        comments_load_count += 1;
+    }
+
+    function closeModal(event) {
+        let y = event.clientY;
+
+        modalContainer.style.display = 'none';
+        modalClose.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        commentsLoadSvg.style.display = 'block';
+        commentsContainer.innerHTML = '';
+        comments_load_count = 0;
+
+        modalPostImg.src = "";
+    }
+
+    function showModal(id, event) {
+        post_id = id;
+        
+        //chatSocket = new WebSocket(`ws://${window.location.host}/ws/detail/${id}/`);
+        postHost = document.getElementById('post-host-' + id).textContent;
+        console.log(postHost);
+        postAvatar = document.getElementById('post-avatar-' + id).src;
+        let postText = document.getElementById('post-text-' + id);
+        let postImg = document.getElementById('post-img-' + id);
+        let postCreated = document.getElementById('post-created-' + id);
+        //console.log("chat socket connected")
+        if (socketIsOpen = true) {
+            loadComments();
+        }
+        let scrollY = window.pageYOffset;
+        scrollY +=50; 
+
+        document.body.style.overflow = 'hidden';
+
+        modalContainer.style.display = 'flex';
+        modalContainer.style.position = "fixed";
+
+        modalClose.style.display = 'block';
+        modalClose.style.top = scrollY + "px";
+        
+        if(postText.textContent.length >= 200) {
+            readMoreText.style.display = 'block'
+        }
+
+        modalPostHost.textContent = postHost.textContent;
+        modalPostText.textContent = postText.textContent;
+        modalPostCreated.textContent = postCreated.textContent;
+        modalPostAvatar.src = postAvatar;
+        modalPostImg.src = postImg.src; 
+    }
+
+    document.querySelector('#comment-submit').onclick = function(e) {
+        if (commentInput.value != '') {
+            document.querySelector('#comment-input').style.height = '50px';
+
+            chatSocketSend('comment_create');
+        }   
+    }
+
+    function toggleReadMore() {
+        let postText = document.getElementById('modal-post-text');
+
+        readMoreText.style.display = 'none'
+        postText.style.whiteSpace = 'normal';
+        console.log("click")
+    }
+
+    function dots_click(id) {
+        let dropdown = document.getElementById(id+'dropdown');
+        let dots = document.getElementById(id+"d");
+        let x = event.clientX;
+        let y = event.clientY;
+        console.log(id+'dropdown')
+
+        document.body.style.overflow = 'hidden';
+
+        dropdown.style.display = 'block';
+        dropdown.style.left = x + 5 + "px";
+        dropdown.style.top = y + "px"; 
+
+        document.addEventListener('click', function (event) {
+            if (!dropdown.contains(event.target) && !dots.contains(event.target)) {
+                dropdown.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+
+    function like(id) {
+        post_id = id;
+        let post = document.getElementById("a_" + post_id + "_liked");
+        let like_count_p = document.getElementById("post_count_"+id);
+        postHost = document.getElementById('post-host-'+id).textContent;
+        console.log("click")
+
+        if(post) {
+            //When liked
+            like_count_p.textContent -= 1;
+
+            post.id = "a_" + post_id;
+
+            let like_svg = document.getElementById('post_svg_'+post_id+'_liked');
+            like_svg.id = 'post_svg_'+post_id;
+            like_svg.src = 'static/images/heart-like-svgrepo-com.svg' ;
+
+            console.log("if1")
+
+            chatSocketSend('cancel_like')
+        } else {
+            let post = document.getElementById("a_" + post_id);
+
+            like_count = parseInt(like_count_p.textContent)
+            like_count_p.textContent = like_count+1;
+
+            post.id = 'a_'+post_id+'_liked';
+            
+            let like_svg = document.getElementById('post_svg_'+post_id)
+            like_svg.id = 'post_svg_'+post_id+'_liked';
+            like_svg.src = 'static/images/heart-like-svgrepo-com-full.svg' 
+
+            console.log("if2")
+
+            chatSocketSend('like')
+        }
+         
+    }
+    
+    function chatSocketSend(type, kwargs) {
+        console.log(type)
+        if (type == "like") {
+            data = {
+                'click_type' : type,
+                'post_id' : post_id,
+                'host' : host
+            };
+        } else if(type == "cancel_like") {
+            data = {
+                'click_type' : type,
+                'post_id' : post_id,
+                'host' : host
+            }
+        } else if(type == 'comment_create') {
+            let text = commentInput.value;
+            data = {
+                'click_type' : type,
+                'post_id' : post_id,
+                'host' : postHost,
+                'text' : text,
+            };
+            console.log(text)
+            console.log("sended")
+            postAvatar = postAvatar.substring(29);
+            insertNewComment(post_id, postHost, text, postAvatar);
+        } else if(type == 'load_comments') {
+            data = {
+                'click_type' : type,
+                'host' : postHost,
+                'post_id' : post_id,
+                ...kwargs
+            }
+        } else if(type == 'load_posts') {
+            data = {
+                'click_type' : type,
+                'host' : host,
+            }
+        }
+        chatSocket.send(
+               JSON.stringify(data)
+        );   
+    } 
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        if (data.type == "load_comments") {
+            console.log("onmessage is work")
+
+            comments_list = data.comments_list
+
+            for(i=0; i<comments_list.length; i++) {
+                insertNewComment(comments_list[i][3], comments_list[i][1], comments_list[i][0], comments_list[i][2])
+            }
+        } else if(data.type == "load_end") {
+            commentsLoadSvg.style.display = 'none';
+        }
+    }
+
+</script>
 
 {% endblock %}

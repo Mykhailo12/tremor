@@ -12,6 +12,9 @@ urlpatterns = [
     path('create/', views.createPost, name="create"),
     path('update/<str:pk>/', views.updatePost, name="update"),
     path('update_profile/<str:pk>/', views.updateProfile, name="update_profile"),
+    path('delete/<str:pk>/', views.deletePost, name='delete'),
+
+    path('getcomment/<str:pk>/', views.getComment, name='getcomment'),
 
     path("chat/<str:room_name>/", views.room, name="room"),
 

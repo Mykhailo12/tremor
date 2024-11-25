@@ -3,17 +3,17 @@
 {% if request.user.is_authenticated %}
     <nav class="navbar navbar-dark navbar-expand-lg">
         <div class="container-fluid">
-          <a class="navbar-brand logo-text" href="#">Tremor</a>
+          <a class="navbar-brand logo-text" href="{% url 'home' %}">Tremor</a>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a href="{% url 'logout' %}" class="nav-link" aria-current="page" href="#">logout</a>
+                <a href="{% url 'logout' %}" class="nav-link" aria-current="page" href="">logout</a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'friends' %}" class="nav-link" aria-current="page" href="#">friends</a>
+                <a href="{% url 'friends' %}" class="nav-link" aria-current="page" href="">friends</a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'peoples' %}" class="nav-link" aria-current="page" href="#">peoples</a>
+                <a href="{% url 'peoples' %}" class="nav-link" aria-current="page" href="">peoples</a>
               </li>
             </ul>
             <ul class="navbar-nav nav-user-info">
@@ -22,7 +22,7 @@
                 <img src="{{STATIC_PREFIX}}images/{% profile request.user %}">
               </li>
               <li class="nav-item user-name">
-                <a class="nav-link active" aria-current="page" href="{% url 'profile' request.user.id %}">{{request.user.username}}</a>
+                <a class="nav-link active" aria-current="page" href="{% url 'profile' request.user.id %}" id="host-nav">{{request.user.username}}</a>
               </li>
             </ul>
           </div>

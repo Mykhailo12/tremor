@@ -7,6 +7,7 @@
             <a href="{% url 'change_friends' operation='remove' pk=friend.pk %}">
                 <input type="button" value="Remove friend">
             </a>
+            <br>
         {% endfor %}
     {% else %}
         <h4>{{text}}</h4>

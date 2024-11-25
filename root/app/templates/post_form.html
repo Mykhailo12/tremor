@@ -2,8 +2,12 @@
 {% block content %}
 <form method="POST" action="" enctype="multipart/form-data">
     {% csrf_token %}
+    description:
     <input type="text" name="text">
+    <br>
+    image:
     <input type="file" name="img">
+    <br>
     <button type="submit">Create</button>
 </form>
 {% endblock %}

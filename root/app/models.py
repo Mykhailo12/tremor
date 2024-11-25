@@ -14,9 +14,19 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     img = models.ImageField(upload_to ='uploads/', null=True, blank=True)
+    likes = models.ManyToManyField(User, blank=True, related_name='likes')
+    comments = models.ManyToManyField('Comment', blank=True, related_name='comments')
 
     class Meta:
         ordering = ['-updated', '-created']
+
+class Comment(models.Model):
+    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    text = models.TextField(max_length=400)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta: 
+        ordering = ['-created']
 
 class Friend(models.Model):
     users = models.ManyToManyField(User, blank=False)
@@ -40,9 +50,15 @@ class Message(models.Model):
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(default=timezone.now)
     seen = models.BooleanField(default=False)
+    parent_message = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies')
 
     def __str__(self):
         return f"{self.text}"
     
     class Meta:
         ordering = ['-updated', '-created']
+
+def get_first_name(self):
+    return self.first_name
+
+User.add_to_class("__str__", get_first_name)
